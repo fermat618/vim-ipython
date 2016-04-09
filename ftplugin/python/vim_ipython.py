@@ -209,7 +209,8 @@ def km_from_string(s=''):
         """)
     # also activate GUI doc balloons if in gvim
     vim.command("""
-        if has('balloon_eval')
+        if has('balloon_eval') && \
+                !(exists('g:ipy_enable_ballon') && g:ipy_enable_balloon == 0)
             set bexpr=IPythonBalloonExpr()
         endif
         """)
