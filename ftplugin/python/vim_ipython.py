@@ -497,9 +497,9 @@ def print_prompt(prompt,msg_id=None):
 
 def with_subchannel(f,*args):
     "conditionally monitor subchannel"
-    def f_with_update(*args):
+    def f_with_update(*fargs, **kwargs):
         try:
-            f(*args)
+            f(*fargs, **kwargs)
             if monitor_subchannel:
                 update_subchannel_msgs(force=True)
         except AttributeError: #if kc is None
@@ -568,6 +568,40 @@ def run_these_lines(dedent=False):
     #vim lines start with 1
     #print("lines %d-%d sent to ipython"% (r.start+1,r.end+1))
     prompt = "lines %d-%d "% (r.start+1,r.end+1)
+    print_prompt(prompt,msg_id)
+
+@with_subchannel
+def run_current_cell(dedent=False, to_next_cell=True):
+    lineno = vim.current.window.cursor[0] - 1
+    nlines = len(vim.current.buffer)
+    start = lineno
+    for start in range(lineno, -1, -1):
+        if vim.current.buffer[start].startswith('#%%'):
+            break
+    if vim.current.buffer[start].startswith('#%%'):
+        start = start + 1
+    end = lineno
+    for end in range(lineno + 1, nlines - 1):
+        if vim.current.buffer[end].startswith('#%%'):
+            end = end - 1
+            break
+    if dedent:
+        lines = list(vim.current.buffer[start:end+1])
+        nonempty_lines = [x for x in lines if x.strip()]
+        if not nonempty_lines:
+            return
+        first_nonempty = nonempty_lines[0]
+        leading = len(first_nonempty) - len(first_nonempty.lstrip())
+        lines = "\n".join(x[leading:] for x in lines)
+    else:
+        lines = "\n".join(vim.current.buffer[start:end+1])
+    msg_id = send(lines)
+    if to_next_cell:
+        if end + 1 < nlines and vim.current.buffer[end+1].startswith('#%%'):
+            vim.current.window.cursor = (min(end + 3, nlines), vim.current.window.cursor[1])
+    else:
+        vim.current.window.cursor = (lineno+1, vim.current.window.cursor[1])
+    prompt = "lines %d-%d "% (start+1,end+1)
     print_prompt(prompt,msg_id)
 
 

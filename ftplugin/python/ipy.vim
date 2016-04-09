@@ -99,6 +99,8 @@ au BufEnter vim-ipython :Python if update_subchannel_msgs(): echo("vim-ipython s
 noremap  <Plug>(IPython-RunFile)            :Python run_this_file()<CR>
 noremap  <Plug>(IPython-RunLine)            :Python run_this_line()<CR>
 noremap  <Plug>(IPython-RunLines)           :Python run_these_lines()<CR>
+noremap  <Plug>(IPython-RunCell)            :Python run_current_cell()<CR>
+noremap  <Plug>(IPython-RunCellHoldCursor)  :Python run_current_cell(to_next_cell=False)<CR>
 noremap  <Plug>(IPython-OpenPyDoc)          :Python get_doc_buffer()<CR>
 noremap  <Plug>(IPython-UpdateShell)        :Python if update_subchannel_msgs(force=True): echo("vim-ipython shell updated",'Operator')<CR>
 noremap  <Plug>(IPython-ToggleReselect)     :Python toggle_reselect()<CR>
@@ -127,6 +129,8 @@ if g:ipy_perform_mappings != 0
     "map  <buffer> <silent> <S-F7>         <Plug>(IPython-BreakpointClearAll)
     imap <buffer>          <C-F5>         <C-o><Plug>(IPython-RunFile)
     imap <buffer>          <S-F5>         <C-o><Plug>(IPython-RunLines)
+    nmap <buffer>          <S-Return>         <Plug>(IPython-RunCell)
+    nmap <buffer>          <C-Return>         <Plug>(IPython-RunCellHoldCursor)
     imap <buffer> <silent> <F5>           <C-o><Plug>(IPython-RunFile)
     map  <buffer>          <C-F5>         <Plug>(IPython-ToggleSendOnSave)
     "" Example of how to quickly clear the current plot with a keystroke
